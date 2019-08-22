@@ -1,0 +1,266 @@
+{
+	"objects": [
+		{
+			"application": "Local|Music UI",
+			"name": "${musicUiAppVersion}",
+			"kind": "ApplicationVersion"
+		},
+		{
+			"application": "Local|Music Backend",
+			"name": "${musicBackendAppVersion}",
+			"kind": "ApplicationVersion"
+		},
+		{
+			"application": "Local|Music IMS",
+			"name": "${musicImsReleaseVersion}",
+			"kind": "ApplicationVersion"
+		},
+		{
+			"applicationVersion": "Local|Music IMS/${musicImsReleaseVersion}",
+			"name": "jira",
+			"kind": "ContentSource",
+			"type": "JIRA JQL",
+			"parameters": {
+				"query": "project = \"MEDS\""
+			},
+			"endpoint": "Jira",
+			"plugin": "Jira/1.2.3"
+		},
+		{
+			"version": "${ReleaseVersion}",
+			"applicationVersions": [
+				"Local|Music IMS/${musicImsReleaseVersion}",
+				"Local|Music Backend/${musicBackendAppVersion}",
+				"Local|Music UI/${musicUiAppVersion}"
+			],
+			"ownerParties": [
+				"superuser@ca.com"
+			],
+			"memberParties": [
+				"superuser@ca.com"
+			],
+			"runOnCreation": false,
+			"name": "${ReleaseName}",
+			"kind": "Release"
+		},
+		{
+			"value": "",
+			"scope": "PHASE_SCOPE",
+			"release": "${ReleaseName}/${ReleaseVersion}",
+			"name": "ID-Num-Token",
+			"kind": "ReleaseToken"
+		},
+		{
+			"environments": [
+				"Test"
+			],
+			"skipTasksWithUnchangedApplications": false,
+			"approvalGate": "MANUAL",
+			"release": "${ReleaseName}/${ReleaseVersion}",
+			"ownerParties": [
+				"superuser@ca.com"
+			],
+			"isApprovalRequired": false,
+			"name": "Test",
+			"kind": "Phase"
+		},
+		{
+			"environments": [
+				"UAT"
+			],
+			"skipTasksWithUnchangedApplications": false,
+			"approvalGate": "MANUAL",
+			"release": "${ReleaseName}/${ReleaseVersion}",
+			"previousPhase": "Test",
+			"isApprovalRequired": false,
+			"name": "UAT",
+			"kind": "Phase"
+		},
+		{
+			"environments": [
+				"Production"
+			],
+			"skipTasksWithUnchangedApplications": false,
+			"approvalGate": "MANUAL",
+			"release": "${ReleaseName}/${ReleaseVersion}",
+			"previousPhase": "UAT",
+			"isApprovalRequired": false,
+			"name": "Production",
+			"kind": "Phase"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Test",
+			"isDisabled": false,
+			"name": "Open Ticket Jira",
+			"kind": "Task",
+			"type": "Create JIRA Issue",
+			"parameters": {
+				"issueType": "Sub-task",
+				"summary": "This is a test",
+				"projectKey": "AP",
+				"advanced": "false"
+			},
+			"endpoint": "Jira",
+			"plugin": "Jira/1.2.3"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Test",
+			"isDisabled": false,
+			"previousTasks": [
+				"Open Ticket Jira"
+			],
+			"name": "SNOW open change",
+			"kind": "Task",
+			"type": "Create Change Request",
+			"parameters": {
+				"shortDescription": "This is a test"
+			},
+			"endpoint": "ServiceNow",
+			"plugin": "ServiceNow/2.2"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Test",
+			"ownerParties": [
+				"superuser@ca.com"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"SNOW open change"
+			],
+			"name": "Deploy Web App",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Test",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy Web App"
+			],
+			"name": "Deploy Reports App",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Test",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy Reports App"
+			],
+			"name": "Run Tests",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Test",
+			"isDisabled": false,
+			"previousTasks": [
+				"Run Tests"
+			],
+			"name": "Deploy by REST",
+			"kind": "Task",
+			"type": "REST",
+			"parameters": {
+				"method": "GET",
+				"statusCheck": "false"
+			},
+			"endpoint": "CDD - REST",
+			"plugin": "REST/2.3"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/UAT",
+			"isDisabled": false,
+			"name": "Deploy Web App",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/UAT",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy Web App"
+			],
+			"name": "Deploy Reports App",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/UAT",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy Reports App"
+			],
+			"name": "Run Tests",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/UAT",
+			"isDisabled": false,
+			"previousTasks": [
+				"Run Tests"
+			],
+			"name": "Deploy by REST",
+			"kind": "Task",
+			"type": "REST",
+			"parameters": {
+				"method": "GET",
+				"statusCheck": "false"
+			},
+			"endpoint": "CDD - REST",
+			"plugin": "REST/2.3"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/UAT",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy by REST"
+			],
+			"name": "Jira",
+			"kind": "Task",
+			"type": "Create JIRA Issue",
+			"parameters": {
+				"issueType": "Story",
+				"summary": "This is a test story",
+				"projectKey": "AP",
+				"advanced": "false"
+			},
+			"endpoint": "Jira",
+			"plugin": "Jira/1.2.3"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Production",
+			"isDisabled": false,
+			"name": "Deploy Web App",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Production",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy Web App"
+			],
+			"name": "Deploy Reports App",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Production",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy Reports App"
+			],
+			"name": "Run Tests",
+			"kind": "Task"
+		},
+		{
+			"phase": "${ReleaseName}/${ReleaseVersion}/Production",
+			"isDisabled": false,
+			"previousTasks": [
+				"Run Tests"
+			],
+			"name": "Deploy by REST",
+			"kind": "Task",
+			"type": "REST",
+			"parameters": {
+				"method": "GET",
+				"statusCheck": "false"
+			},
+			"endpoint": "CDD - REST",
+			"plugin": "REST/2.3"
+		}
+	]
+}
