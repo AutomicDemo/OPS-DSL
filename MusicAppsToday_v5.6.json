@@ -162,7 +162,7 @@
 				"statusCheck": "false"
 			},
 			"endpoint": "CDD - REST",
-			"plugin": "REST/2.3"
+			"plugin": "REST/2.4"
 		},
 		{
 			"phase": "${ReleaseName}/${ReleaseVersion}/UAT",
@@ -202,7 +202,7 @@
 				"statusCheck": "false"
 			},
 			"endpoint": "CDD - REST",
-			"plugin": "REST/2.3"
+			"plugin": "REST/2.4"
 		},
 		{
 			"phase": "${ReleaseName}/${ReleaseVersion}/UAT",
@@ -260,7 +260,7 @@
 				"statusCheck": "false"
 			},
 			"endpoint": "CDD - REST",
-			"plugin": "REST/2.3"
+			"plugin": "REST/2.4"
 		}
 	]
 }
