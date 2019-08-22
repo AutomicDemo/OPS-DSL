@@ -161,7 +161,7 @@
 				"method": "GET",
 				"statusCheck": "false"
 			},
-			"endpoint": "CDD - REST",
+			"endpoint": "REST",
 			"plugin": "REST/2.4"
 		},
 		{
@@ -201,7 +201,7 @@
 				"method": "GET",
 				"statusCheck": "false"
 			},
-			"endpoint": "CDD - REST",
+			"endpoint": "REST",
 			"plugin": "REST/2.4"
 		},
 		{
@@ -259,7 +259,7 @@
 				"method": "GET",
 				"statusCheck": "false"
 			},
-			"endpoint": "CDD - REST",
+			"endpoint": "REST",
 			"plugin": "REST/2.4"
 		}
 	]
