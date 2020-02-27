@@ -1,0 +1,560 @@
+{
+	"objects": [
+		{
+			"application": "Local|AR-SQL",
+			"name": "${AR-SQL-VER}",
+			"kind": "ApplicationVersion"
+		},
+		{
+			"application": "Local|AR-Server",
+			"name": "${AR-Server-VER}",
+			"kind": "ApplicationVersion"
+		},
+		{
+			"application": "Local|AR-GUI",
+			"name": "${AR-GUI-VER}",
+			"kind": "ApplicationVersion"
+		},
+		{
+			"version": "${RELEASE-VERSION}",
+			"applicationVersions": [
+				"Local|AR-SQL/${AR-SQL-VER}",
+				"Local|AR-Server/${AR-Server-VER}",
+				"Local|AR-GUI/${AR-GUI-VER}"
+			],
+			"ownerParties": [
+				"assaf.shlomi@broadcom.com"
+			],
+			"markAsDonePhaseName": "",
+			"runOnCreation": false,
+			"name": "${RELEASE-NAME}",
+			"kind": "Release"
+		},
+		{
+			"release": "${RELEASE-NAME}/${RELEASE-VERSION}",
+			"scope": "PHASE_SCOPE",
+			"isProduction": false,
+			"value": "",
+			"name": "SnowChangeTicket",
+			"kind": "ReleaseToken"
+		},
+		{
+			"release": "${RELEASE-NAME}/${RELEASE-VERSION}",
+			"environments": [
+				"AR-CI"
+			],
+			"approvalGate": "AUTOMATIC",
+			"isApprovalRequired": false,
+			"skipTasksWithUnchangedApplications": true,
+			"name": "CI",
+			"kind": "Phase"
+		},
+		{
+			"release": "${RELEASE-NAME}/${RELEASE-VERSION}",
+			"environments": [
+				"AR-UAT"
+			],
+			"approvalGate": "MANUAL",
+			"previousPhase": "CI",
+			"isApprovalRequired": false,
+			"skipTasksWithUnchangedApplications": true,
+			"name": "QA",
+			"kind": "Phase"
+		},
+		{
+			"release": "${RELEASE-NAME}/${RELEASE-VERSION}",
+			"environments": [
+				"AR-Prep"
+			],
+			"approvalGate": "MANUAL",
+			"previousPhase": "QA",
+			"isApprovalRequired": false,
+			"skipTasksWithUnchangedApplications": true,
+			"name": "Pre-Production",
+			"kind": "Phase"
+		},
+		{
+			"release": "${RELEASE-NAME}/${RELEASE-VERSION}",
+			"environments": [
+				"AR-Prep"
+			],
+			"approvalGate": "MANUAL",
+			"previousPhase": "Pre-Production",
+			"isApprovalRequired": false,
+			"skipTasksWithUnchangedApplications": true,
+			"name": "Production",
+			"kind": "Phase"
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/CI",
+			"applicationVersions": [
+				"Local|AR-SQL/${AR-SQL-VER}"
+			],
+			"isDisabled": false,
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Create AR-SQL Package",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start General Workflow",
+			"parameters": {
+				"workflow": "Create AR Package",
+				"dynamic_property": "workflow/package_name",
+				"dynamic_property_value": "AR-SQL-%AR-SQL.last_successful_change%",
+				"additional_dynamic_properties": "{\"application_name\": \"AR-SQL\"}",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/CI",
+			"applicationVersions": [
+				"Local|AR-SQL/${AR-SQL-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Create AR-SQL Package"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-SQL",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "AR-SQL-%AR-SQL.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-DEV",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/CI",
+			"applicationVersions": [
+				"Local|AR-Server/${AR-Server-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-SQL"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Create AR-Server Package",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start General Workflow",
+			"parameters": {
+				"workflow": "Create AR Package",
+				"dynamic_property": "workflow/package_name",
+				"dynamic_property_value": "AR-SVC-%AR-Server.last_successful_change%",
+				"additional_dynamic_properties": "{\"application_name\": \"AR-Server\"}",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/CI",
+			"applicationVersions": [
+				"Local|AR-Server/${AR-Server-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Create AR-Server Package"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-Server",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "AR-SVC-%AR-Server.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-DEV",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/CI",
+			"applicationVersions": [
+				"Local|AR-GUI/${AR-GUI-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-Server"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Create AR-GUI Package",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start General Workflow",
+			"parameters": {
+				"workflow": "Create AR Package",
+				"dynamic_property": "workflow/package_name",
+				"dynamic_property_value": "AR-GUI-%AR-GUI.last_successful_change%",
+				"additional_dynamic_properties": "{\"application_name\": \"AR-GUI\"}",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/CI",
+			"applicationVersions": [
+				"Local|AR-GUI/${AR-GUI-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Create AR-GUI Package"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-GUI",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "AR-GUI-%AR-GUI.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-DEV",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/QA",
+			"isDisabled": false,
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Create Change Ticket",
+			"kind": "Task",
+			"endpoint": "ServiceNow",
+			"plugin": "ServiceNow/2.2",
+			"type": "Create Change Request",
+			"parameters": {
+				"changeRequestId": "%SnowChangeTicket%",
+				"shortDescription": "New Deployment for AR application - builds: %AR-GUI.last_successful_change%, %AR-SQL.last_successful_change%, %AR-Server.last_successful_change%"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/QA",
+			"applicationVersions": [
+				"Local|AR-SQL/${AR-SQL-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Create Change Ticket"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-SQL",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-SQL.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-QA",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/QA",
+			"applicationVersions": [
+				"Local|AR-Server/${AR-Server-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-SQL"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-Server",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-Server.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-QA",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/QA",
+			"applicationVersions": [
+				"Local|AR-GUI/${AR-GUI-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-Server"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-GUI",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-GUI.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-QA",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/QA",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-GUI"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Close Ticket",
+			"kind": "Task",
+			"endpoint": "ServiceNow",
+			"plugin": "ServiceNow/2.2",
+			"type": "Update Ticket",
+			"parameters": {
+				"changeRequestId": "%SnowChangeTicket%",
+				"changeRequestContent": "{\"Approval\": \"Approved\"}",
+				"ticketType": "Change Request"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Pre-Production",
+			"isDisabled": false,
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Create Change Ticket",
+			"kind": "Task",
+			"endpoint": "ServiceNow",
+			"plugin": "ServiceNow/2.2",
+			"type": "Create Change Request",
+			"parameters": {
+				"changeRequestId": "%SnowChangeTicket%",
+				"shortDescription": "New Deployment for AR application - builds: %AR-GUI.last_successful_change%, %AR-SQL.last_successful_change%, %AR-Server.last_successful_change%"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Pre-Production",
+			"applicationVersions": [
+				"Local|AR-SQL/${AR-SQL-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Create Change Ticket"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-SQL",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-SQL.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-PREP",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Pre-Production",
+			"applicationVersions": [
+				"Local|AR-Server/${AR-Server-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-SQL"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-Server",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-Server.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-PREP",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Pre-Production",
+			"applicationVersions": [
+				"Local|AR-GUI/${AR-GUI-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-Server"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-GUI",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-GUI.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-PREP",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Pre-Production",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-GUI"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Close Ticket",
+			"kind": "Task",
+			"endpoint": "ServiceNow",
+			"plugin": "ServiceNow/2.2",
+			"type": "Update Ticket",
+			"parameters": {
+				"changeRequestId": "%SnowChangeTicket%",
+				"changeRequestContent": "{\"Approval\": \"Approved\"}",
+				"ticketType": "Change Request"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Production",
+			"isDisabled": false,
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Create Change Ticket",
+			"kind": "Task",
+			"endpoint": "ServiceNow",
+			"plugin": "ServiceNow/2.2",
+			"type": "Create Change Request",
+			"parameters": {
+				"changeRequestId": "%SnowChangeTicket%",
+				"shortDescription": "New Deployment for AR application - builds: %AR-GUI.last_successful_change%, %AR-SQL.last_successful_change%, %AR-Server.last_successful_change%"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Production",
+			"applicationVersions": [
+				"Local|AR-SQL/${AR-SQL-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Create Change Ticket"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-SQL",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-SQL.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-PROD",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Production",
+			"applicationVersions": [
+				"Local|AR-Server/${AR-Server-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-SQL"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-Server",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-Server.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-PROD",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Production",
+			"applicationVersions": [
+				"Local|AR-GUI/${AR-GUI-VER}"
+			],
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-Server"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Deploy AR-GUI",
+			"kind": "Task",
+			"endpoint": "CDA",
+			"plugin": "CDA/3.0.0",
+			"type": "Start Application Workflow",
+			"parameters": {
+				"package": "%AR-GUI.last_successful_change%",
+				"application": "AccountsReceivable",
+				"workflow": "Deploy",
+				"deployment_profile": "AR-PROD",
+				"install_mode": "Overwrite Existing",
+				"compensation_parameters": "false"
+			}
+		},
+		{
+			"phase": "${RELEASE-NAME}/${RELEASE-VERSION}/Production",
+			"isDisabled": false,
+			"previousTasks": [
+				"Deploy AR-GUI"
+			],
+			"isOnFailurePhaseEnabled": true,
+			"isSkipTaskOnFailure": false,
+			"name": "Close Ticket",
+			"kind": "Task",
+			"endpoint": "ServiceNow",
+			"plugin": "ServiceNow/2.2",
+			"type": "Update Ticket",
+			"parameters": {
+				"changeRequestId": "%SnowChangeTicket%",
+				"changeRequestContent": "{\"Approval\": \"Approved\"}",
+				"ticketType": "Change Request"
+			}
+		}
+	]
+}
