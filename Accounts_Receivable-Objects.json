@@ -26,7 +26,7 @@
 				"assaf.shlomi@broadcom.com"
 			],
 			"markAsDonePhaseName": "",
-			"runOnCreation": ${Run-on-Creation},
+			"runOnCreation": "${Run-on-Creation}",
 			"name": "${RELEASE-NAME}",
 			"kind": "Release"
 		},
